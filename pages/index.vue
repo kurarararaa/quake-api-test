@@ -119,7 +119,7 @@ export default {
     CHeading
   },
   inject: ['$chakraColorMode', '$toggleColorMode'],
-  data () {
+  data() {
     return {
       showModal: false,
       mainStyles: {
@@ -135,21 +135,21 @@ export default {
     }
   },
   computed: {
-    colorMode () {
+    colorMode() {
       return this.$chakraColorMode()
     },
-    theme () {
+    theme() {
       return this.$chakraTheme()
     },
-    toggleColorMode () {
+    toggleColorMode() {
       return this.$toggleColorMode
     }
   },
   methods: {
-    showToast () {
+    showToast() {
       this.$toast({
         title: 'Account created.',
-        description: "We've created your account for you.",
+        description: 'We\'ve created your account for you.',
         status: 'success',
         duration: 10000,
         isClosable: true
