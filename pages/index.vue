@@ -1,5 +1,22 @@
 <template>
   <div class="container">
+    <CBox v-bind="mainStyles[colorMode]">
+      <nav class="navbar">
+        <h2>⚡️ 地震情報 API てすと</h2>
+        <ul>
+          <li>
+            <CIconButton
+              mr="3"
+              :icon="colorMode === 'light' ? 'moon' : 'sun'"
+              :aria-label="`Switch to ${
+                colorMode === 'light' ? 'dark' : 'light'
+              } mode`"
+              @click="toggleColorMode"
+            />
+          </li>
+        </ul>
+      </nav>
+    </CBox>
     <CBox
       v-bind="mainStyles[colorMode]"
       d="flex"
@@ -8,73 +25,13 @@
       flex-dir="column"
       justify-content="center"
     >
-      <CHeading text-align="center" mb="4"> ⚡️ Hello chakra-ui/vue </CHeading>
+      <CHeading text-align="center" mb="4"> ⚡️ 気象庁の地震情報を取得する </CHeading>
       <CFlex justify="center" direction="column" align="center">
         <CBox mb="3">
-          <CIconButton
-            mr="3"
-            :icon="colorMode === 'light' ? 'moon' : 'sun'"
-            :aria-label="`Switch to ${
-              colorMode === 'light' ? 'dark' : 'light'
-            } mode`"
-            @click="toggleColorMode"
-          />
-          <CButton left-icon="info" variant-color="blue" @click="showToast">
-            Show Toast
+          <CButton left-icon="star" variant-color="blue" @click="requestQuakeApi">
+            しゅとく！
           </CButton>
         </CBox>
-        <CAvatarGroup>
-          <CAvatar
-            name="Evan You"
-            alt="Evan You"
-            src="https://pbs.twimg.com/profile_images/1206997998900850688/cTXTQiHm_400x400.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar
-            name="Jonathan Bakebwa"
-            alt="Jonathan Bakebwa"
-            src="https://res.cloudinary.com/xtellar/image/upload/v1572857445/me_zqos4e.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar
-            name="Segun Adebayo"
-            alt="Segun Adebayo"
-            src="https://pbs.twimg.com/profile_images/1169353373012897802/skPUWd6e_400x400.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar src="pop">
-            <CAvatarBadge size="1.0em" border-color="papayawhip" bg="tomato" />
-          </CAvatar>
-        </CAvatarGroup>
-        <CButton
-          left-icon="close"
-          variant-color="red"
-          mt="3"
-          @click="showModal = true"
-        >
-          Delete Account
-        </CButton>
-        <CModal :is-open="showModal">
-          <CModalOverlay />
-          <CModalContent>
-            <CModalHeader>Are you sure?</CModalHeader>
-            <CModalBody>Deleting user cannot be undone</CModalBody>
-            <CModalFooter>
-              <CButton @click="showModal = false"> Cancel </CButton>
-              <CButton
-                margin-left="3"
-                variant-color="red"
-                @click="showModal = false"
-              >
-                Delete User
-              </CButton>
-            </CModalFooter>
-            <CModalCloseButton @click="showModal = false" />
-          </CModalContent>
-        </CModal>
       </CFlex>
     </CBox>
   </div>
@@ -84,16 +41,6 @@
 import {
   CBox,
   CButton,
-  CAvatarGroup,
-  CAvatar,
-  CAvatarBadge,
-  CModal,
-  CModalContent,
-  CModalOverlay,
-  CModalHeader,
-  CModalFooter,
-  CModalBody,
-  CModalCloseButton,
   CIconButton,
   CFlex,
   CHeading
@@ -104,16 +51,6 @@ export default {
   components: {
     CBox,
     CButton,
-    CAvatarGroup,
-    CAvatar,
-    CAvatarBadge,
-    CModal,
-    CModalContent,
-    CModalOverlay,
-    CModalHeader,
-    CModalFooter,
-    CModalBody,
-    CModalCloseButton,
     CIconButton,
     CFlex,
     CHeading
@@ -121,7 +58,7 @@ export default {
   inject: ['$chakraColorMode', '$toggleColorMode'],
   data() {
     return {
-      showModal: false,
+      quakes: [],
       mainStyles: {
         dark: {
           bg: 'gray.700',
@@ -146,15 +83,50 @@ export default {
     }
   },
   methods: {
-    showToast() {
+    async requestQuakeApi() {
+      const endPoint = 'https://api.p2pquake.net/v1/human-readable'
+      // const headers = {}
+      const params = {
+        limit: 5,
+      }
+
+      const res = await this.$axios.get(endPoint, {
+        // headers,
+        params,
+      })
+      this.quakes = res.data
+      console.log(this.quakes)
+
       this.$toast({
-        title: 'Account created.',
-        description: 'We\'ve created your account for you.',
+        title: '地震情報を取得しました',
+        description: '直近 5 件の地震情報です。',
         status: 'success',
-        duration: 10000,
+        duration: 3000,
         isClosable: true
       })
     }
   }
 }
 </script>
+
+<style scoped>
+.navbar {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  padding: var(--chakra-space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--chakra-shadows-md);
+}
+
+.navbar h2 {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.navbar ul {
+  list-style: none;
+}
+</style>
